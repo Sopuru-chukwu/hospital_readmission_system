@@ -65,7 +65,7 @@ export const RiskResultDashboard: React.FC<RiskResultDashboardProps> = ({
           Ready for Risk Prediction
         </h3>
         <p className="mt-2 max-w-sm text-xs text-slate-500 dark:text-slate-400">
-          Configure patient parameters on the left and click "Calculate Readmission Risk" or pick a sample profile preset.
+          Configure patient parameters on the left and click "Calculate Readmission Risk" or select a clinical profile preset.
         </p>
       </div>
     );

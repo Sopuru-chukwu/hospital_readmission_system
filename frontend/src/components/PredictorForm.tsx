@@ -47,6 +47,16 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
     if (field === 'patient_name') {
       setIsSearching(true);
       setLoadedNotice(null);
+      const valStr = String(value).trim();
+      if (valStr.length > 2) {
+        const exactMatch = historyRecords.find(
+          r => r.patient_name.toLowerCase().trim() === valStr.toLowerCase()
+        );
+        if (exactMatch) {
+          handleSelectHistoryRecord(exactMatch);
+          return;
+        }
+      }
     }
     onChange({
       ...formData,

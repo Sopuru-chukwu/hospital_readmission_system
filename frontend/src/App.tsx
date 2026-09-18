@@ -17,6 +17,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
+import { LandingPage } from './components/LandingPage';
 import { PredictorForm } from './components/PredictorForm';
 import { RiskResultDashboard } from './components/RiskResultDashboard';
 import { CohortAnalytics } from './components/CohortAnalytics';
@@ -57,7 +58,7 @@ const defaultFormData: ReadmissionPredictionRequest = {
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [devMode, setDevMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<'predictor' | 'batch' | 'history' | 'analytics' | 'system'>('predictor');
+  const [activeTab, setActiveTab] = useState<'landing' | 'predictor' | 'batch' | 'history' | 'analytics' | 'system'>('landing');
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
   // Auth State
@@ -96,7 +97,19 @@ function App() {
   const handleLogout = () => {
     api.logout();
     setCurrentUser(null);
+    setActiveTab('landing');
   };
+
+  // Sync activeTab state with user authentication
+  useEffect(() => {
+    if (currentUser) {
+      if (activeTab === 'landing') {
+        setActiveTab('predictor');
+      }
+    } else {
+      setActiveTab('landing');
+    }
+  }, [currentUser]);
 
   // Toggle Dark Mode
   useEffect(() => {
@@ -206,7 +219,10 @@ function App() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Logo & Workspace Title */}
-          <div className="flex items-center space-x-3">
+          <div 
+            onClick={() => setActiveTab('landing')}
+            className="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition"
+          >
             <div className="rounded-xl bg-medical-500/10 p-2 text-medical-600 dark:text-medical-400">
               <Activity className="h-6 w-6 animate-pulse" />
             </div>
@@ -215,77 +231,79 @@ function App() {
             </span>
           </div>
 
-          {/* Clinical Navigation Tabs */}
-          <nav className="hidden md:flex items-center space-x-1 rounded-2xl bg-slate-100 p-1 dark:bg-slate-900">
-            <button
-              onClick={() => setActiveTab('predictor')}
-              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
-                activeTab === 'predictor'
-                  ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-              }`}
-            >
-              <Stethoscope className="h-4 w-4" />
-              <span>Patient Predictor</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('batch')}
-              className={`flex items-center space-x-1.5 rounded-xl px-4 py-2 text-xs font-bold transition ${
-                activeTab === 'batch'
-                  ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-              }`}
-            >
-              <UploadCloud className="h-4 w-4" />
-              <span>Batch Ingestion</span>
-              {currentUser && currentUser.role !== 'Administrator' && (
-                <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-extrabold text-amber-600 dark:text-amber-400">Admin</span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
-                activeTab === 'history'
-                  ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-              }`}
-            >
-              <FileSpreadsheet className="h-4 w-4" />
-              <span>Audit & History</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('analytics')}
-              className={`flex items-center space-x-1.5 rounded-xl px-4 py-2 text-xs font-bold transition ${
-                activeTab === 'analytics'
-                  ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-              }`}
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span>Cohort Analytics</span>
-              {currentUser && currentUser.role === 'Nurse' && (
-                <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400">MD/Admin</span>
-              )}
-            </button>
-
-            {/* Developer-Only System Tab */}
-            {devMode && (
+          {/* Clinical Navigation Tabs (Only rendered when user is signed in) */}
+          {currentUser && (
+            <nav className="hidden md:flex items-center space-x-1 rounded-2xl bg-slate-100 p-1 dark:bg-slate-900">
               <button
-                onClick={() => setActiveTab('system')}
+                onClick={() => setActiveTab('predictor')}
                 className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
-                  activeTab === 'system'
+                  activeTab === 'predictor'
                     ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
                     : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                 }`}
               >
-                <Server className="h-4 w-4" />
-                <span>Developer API</span>
+                <Stethoscope className="h-4 w-4" />
+                <span>Patient Predictor</span>
               </button>
-            )}
-          </nav>
+
+              <button
+                onClick={() => setActiveTab('batch')}
+                className={`flex items-center space-x-1.5 rounded-xl px-4 py-2 text-xs font-bold transition ${
+                  activeTab === 'batch'
+                    ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <UploadCloud className="h-4 w-4" />
+                <span>Batch Ingestion</span>
+                {currentUser.role !== 'Administrator' && (
+                  <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-extrabold text-amber-600 dark:text-amber-400">Admin</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
+                  activeTab === 'history'
+                    ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                <span>Audit & History</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`flex items-center space-x-1.5 rounded-xl px-4 py-2 text-xs font-bold transition ${
+                  activeTab === 'analytics'
+                    ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span>Cohort Analytics</span>
+                {currentUser.role === 'Nurse' && (
+                  <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400">MD/Admin</span>
+                )}
+              </button>
+
+              {/* Developer-Only System Tab */}
+              {devMode && (
+                <button
+                  onClick={() => setActiveTab('system')}
+                  className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
+                    activeTab === 'system'
+                      ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                  }`}
+                >
+                  <Server className="h-4 w-4" />
+                  <span>Developer API</span>
+                </button>
+              )}
+            </nav>
+          )}
 
           {/* Dev Mode & Theme Controls */}
           <div className="flex items-center space-x-3">
@@ -361,44 +379,51 @@ function App() {
       {/* Main Container */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         
-        {/* Mobile Tab Switcher */}
-        <div className="flex md:hidden mb-6 space-x-1 rounded-xl bg-slate-200 p-1 dark:bg-slate-900">
-          <button
-            onClick={() => setActiveTab('predictor')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg ${activeTab === 'predictor' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
-          >
-            Predictor
-          </button>
-          <button
-            onClick={() => setActiveTab('batch')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg ${activeTab === 'batch' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
-          >
-            Batch
-          </button>
-          <button
-            onClick={() => setActiveTab('history')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg ${activeTab === 'history' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
-          >
-            History
-          </button>
+        {/* Render Landing Overview when NO user is signed in */}
+        {!currentUser ? (
+          <LandingPage 
+            onNavigateTab={() => setIsAuthModalOpen(true)} 
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            currentUser={currentUser}
+          />
+        ) : (
+          <>
+            {/* Mobile Tab Switcher (Only rendered when user is signed in) */}
+            <div className="flex md:hidden mb-6 space-x-1 rounded-xl bg-slate-200 p-1 dark:bg-slate-900 overflow-x-auto">
+              <button
+                onClick={() => setActiveTab('predictor')}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'predictor' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+              >
+                Predictor
+              </button>
+              <button
+                onClick={() => setActiveTab('batch')}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'batch' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+              >
+                Batch
+              </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'history' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+              >
+                History
+              </button>
 
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg ${activeTab === 'analytics' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
-          >
-            Cohort
-          </button>
-          {devMode && (
-            <button
-              onClick={() => setActiveTab('system')}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg ${activeTab === 'system' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
-            >
-              Dev API
-            </button>
-          )}
-        </div>
-
-
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'analytics' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+              >
+                Cohort
+              </button>
+              {devMode && (
+                <button
+                  onClick={() => setActiveTab('system')}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'system' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+                >
+                  Dev API
+                </button>
+              )}
+            </div>
 
         {/* Tab 1: Predictor Workspace */}
         {activeTab === 'predictor' && (
@@ -577,6 +602,8 @@ function App() {
 
             </div>
           </div>
+        )}
+          </>
         )}
 
       </main>

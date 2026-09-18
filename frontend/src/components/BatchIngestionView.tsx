@@ -38,7 +38,7 @@ export const BatchIngestionView: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'sample_diabetic_patient_cohort.csv');
+    link.setAttribute('download', 'diabetic_patient_cohort_template.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -205,7 +205,7 @@ export const BatchIngestionView: React.FC = () => {
             className="inline-flex items-center space-x-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition"
           >
             <Download className="h-4 w-4 text-medical-500" />
-            <span>Download Sample Batch CSV</span>
+            <span>Download CSV Cohort Template</span>
           </button>
         </div>
       </div>

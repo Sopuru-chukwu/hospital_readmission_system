@@ -68,21 +68,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       onSuccess(res.user);
       onClose();
     } catch (err: any) {
-      setErrorMsg('Demo authentication error. Please try again.');
+      setErrorMsg('Authentication error. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md animate-fadeIn">
-      
-      <div className="glass relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl dark:border-slate-800 dark:bg-slate-900 text-slate-900 dark:text-white">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white transition"
+          className="absolute right-5 top-5 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white transition"
         >
           <X className="h-5 w-5" />
         </button>
@@ -92,20 +91,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-medical-500/10 text-medical-600 dark:text-medical-400">
             <ShieldCheck className="h-6 w-6" />
           </div>
-          <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            {isRegisterMode ? 'Register Clinical Account' : 'Clinical Portal Access'}
-          </h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Secure NDPR & HIPAA Compliant Healthcare Portal Authentication
+          <h3 className="mt-4 text-2xl font-extrabold tracking-tight">
+            {isRegisterMode ? 'Create Clinical Account' : 'Sign In to DiaPredict.AI'}
+          </h3>
+          <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            {isRegisterMode
+              ? 'Register a new clinician account for role-based readmission risk assessment.'
+              : 'Sign in to access patient records, audit logs, and risk analytics.'}
           </p>
         </div>
 
-        {/* Quick Demo Credentials Selector */}
+        {/* Preset Role Credentials Selector */}
         {!isRegisterMode && (
           <div className="mt-6 rounded-2xl bg-slate-100/80 p-3.5 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800">
             <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Quick 1-Click Demo Profiles:</span>
+              <span>Select Role Profile Credentials:</span>
             </div>
             <div className="mt-2.5 grid gap-2 sm:grid-cols-3">
               <button

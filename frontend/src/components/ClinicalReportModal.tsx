@@ -89,7 +89,7 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
                 }
                 return (
                   <div className="mt-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">
-                    [DEMO / UNVERIFIED ENCOUNTER]
+                    [PRE-ADMISSION EVALUATION]
                   </div>
                 );
               })()}
@@ -212,6 +212,11 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Medical Disclaimer & Clinical Decision Support Notice */}
+          <div className="rounded-xl bg-slate-100 p-3 text-[10px] text-slate-500 dark:bg-slate-900 dark:text-slate-400 border border-slate-200 dark:border-slate-800">
+            <strong>Clinical Decision Support Disclaimer:</strong> This machine learning assessment provides statistical 30-day readmission risk estimations based on ensemble clinical data modeling. It is designed to assist care planning and does not replace attending physician clinical judgment or formal diagnostic evaluation.
           </div>
 
           {/* Medical Staff Attestation & Signatures */}
