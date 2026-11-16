@@ -94,19 +94,29 @@ function App() {
     }
   }, []);
 
+  const canAccessDevTools = currentUser?.role === 'Administrator';
+
   const handleLogout = () => {
     api.logout();
     setCurrentUser(null);
+    setDevMode(false);
     setActiveTab('landing');
   };
 
-  // Sync activeTab state with user authentication
+  // Sync activeTab & devMode state with user authentication and role
   useEffect(() => {
     if (currentUser) {
+      if (currentUser.role !== 'Administrator') {
+        setDevMode(false);
+        if (activeTab === 'system') {
+          setActiveTab('predictor');
+        }
+      }
       if (activeTab === 'landing') {
         setActiveTab('predictor');
       }
     } else {
+      setDevMode(false);
       setActiveTab('landing');
     }
   }, [currentUser]);
@@ -142,6 +152,9 @@ function App() {
 
   // Run Prediction Call
   const handleCalculateRisk = async () => {
+    if (!formData.patient_name || !formData.patient_name.trim()) {
+      return;
+    }
     setIsLoading(true);
     try {
       const res = await api.predictReadmission(formData);
@@ -170,17 +183,7 @@ function App() {
 
   const handleSelectSample = (sample: SamplePatientCase) => {
     setFormData(sample.patient_data);
-    setIsLoading(true);
-    setTimeout(async () => {
-      try {
-        const res = await api.predictReadmission(sample.patient_data);
-        setPrediction(res);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 200);
+    setPrediction(null);
   };
 
   const handleSelectHistoryRecord = (record: PatientHistoryRecord) => {
@@ -197,18 +200,8 @@ function App() {
       primary_diagnosis: record.primary_diagnosis,
       discharge_disposition: record.discharge_disposition
     });
+    setPrediction(null);
     setActiveTab('predictor');
-    setIsLoading(true);
-    setTimeout(async () => {
-      try {
-        const res = await api.predictReadmission(formData);
-        setPrediction(res);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 150);
   };
 
   return (
@@ -288,8 +281,8 @@ function App() {
                 )}
               </button>
 
-              {/* Developer-Only System Tab */}
-              {devMode && (
+              {/* Developer-Only System Tab (Administrator Only) */}
+              {canAccessDevTools && devMode && (
                 <button
                   onClick={() => setActiveTab('system')}
                   className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
@@ -308,8 +301,8 @@ function App() {
           {/* Dev Mode & Theme Controls */}
           <div className="flex items-center space-x-3">
             
-            {/* Show API health status badge ONLY in Dev Mode */}
-            {devMode && (
+            {/* Show API health status badge ONLY in Dev Mode for Administrators */}
+            {canAccessDevTools && devMode && (
               <div className="flex items-center space-x-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                 <span className={`h-2.5 w-2.5 rounded-full ${
                   apiStatus === 'online' ? 'bg-emerald-500 animate-ping' : apiStatus === 'offline' ? 'bg-red-500' : 'bg-yellow-500'
@@ -348,19 +341,21 @@ function App() {
               </button>
             )}
 
-            {/* Developer Mode Toggle Button */}
-            <button
-              onClick={() => setDevMode(!devMode)}
-              className={`flex items-center space-x-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition ${
-                devMode 
-                  ? 'bg-medical-500/10 text-medical-600 border-medical-500/30 dark:text-medical-400' 
-                  : 'border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white'
-              }`}
-              title="Toggle Developer Tools & API Diagnostics"
-            >
-              <Code2 className="h-4 w-4" />
-              <span className="hidden sm:inline">{devMode ? 'Dev Mode ON' : 'Dev Tools'}</span>
-            </button>
+            {/* Developer Mode Toggle Button (Visible only to Administrators) */}
+            {canAccessDevTools && (
+              <button
+                onClick={() => setDevMode(!devMode)}
+                className={`flex items-center space-x-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition ${
+                  devMode 
+                    ? 'bg-medical-500/10 text-medical-600 border-medical-500/30 dark:text-medical-400' 
+                    : 'border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white'
+                }`}
+                title="Toggle Developer Tools & API Diagnostics"
+              >
+                <Code2 className="h-4 w-4" />
+                <span className="hidden sm:inline">{devMode ? 'Dev Mode ON' : 'Dev Tools'}</span>
+              </button>
+            )}
 
             {/* Dark Mode Toggle */}
             <button
@@ -415,7 +410,7 @@ function App() {
               >
                 Cohort
               </button>
-              {devMode && (
+              {canAccessDevTools && devMode && (
                 <button
                   onClick={() => setActiveTab('system')}
                   className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'system' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
@@ -544,8 +539,8 @@ function App() {
         )}
 
 
-        {/* Tab 3: System Scaffolding & API */}
-        {activeTab === 'system' && (
+        {/* Tab 3: System Scaffolding & API (Administrator Only) */}
+        {canAccessDevTools && activeTab === 'system' && (
           <div className="space-y-8">
             <div className="glass rounded-3xl border border-slate-200 p-8 shadow-xl dark:border-slate-800">
               <div className="flex items-center justify-between">

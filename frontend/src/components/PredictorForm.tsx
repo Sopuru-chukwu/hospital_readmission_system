@@ -9,10 +9,14 @@ import {
   RefreshCw,
   Search,
   CheckCircle2,
-  Database
+  Database,
+  AlertCircle
 } from 'lucide-react';
 import { api } from '../services/api';
 import type { ReadmissionPredictionRequest, SamplePatientCase, PatientHistoryRecord } from '../types/prediction';
+
+type StepTab = 'demographics' | 'metrics' | 'labs';
+const ALL_STEPS: StepTab[] = ['demographics', 'metrics', 'labs'];
 
 interface PredictorFormProps {
   formData: ReadmissionPredictionRequest;
@@ -31,10 +35,16 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
   sampleCases,
   onSelectSample,
 }) => {
-  const [activeTab, setActiveTab] = useState<'demographics' | 'metrics' | 'labs'>('demographics');
+  const [activeTab, setActiveTab] = useState<StepTab>('demographics');
+  const [visitedSteps, setVisitedSteps] = useState<Set<StepTab>>(() => new Set(['demographics']));
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [historyRecords, setHistoryRecords] = useState<PatientHistoryRecord[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [loadedNotice, setLoadedNotice] = useState<string | null>(null);
+
+  const hasPatientName = Boolean(formData.patient_name && formData.patient_name.trim().length > 0);
+  const allStepsVisited = ALL_STEPS.every((step) => visitedSteps.has(step));
+  const canSubmit = hasPatientName && allStepsVisited;
 
   // Load past patient records for auto-completion lookup
   useEffect(() => {
@@ -43,10 +53,48 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
       .catch(() => setHistoryRecords([]));
   }, []);
 
+  const handleTabChange = (targetTab: StepTab) => {
+    if (targetTab !== 'demographics' && !hasPatientName) {
+      setValidationError('Please enter a Patient Name / Hospital Record ID (MRN) before proceeding to the next steps.');
+      setActiveTab('demographics');
+      return;
+    }
+    if (targetTab === 'labs' && !visitedSteps.has('metrics')) {
+      setValidationError('Please review Step 2 (Admission & Utilization) before proceeding to Step 3.');
+      setActiveTab('metrics');
+      setVisitedSteps((prev) => new Set(prev).add('metrics'));
+      return;
+    }
+    setValidationError(null);
+    setActiveTab(targetTab);
+    setVisitedSteps((prev) => new Set(prev).add(targetTab));
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hasPatientName) {
+      setValidationError('Patient Name / Hospital Record ID (MRN) is required before submitting.');
+      setActiveTab('demographics');
+      return;
+    }
+    if (!allStepsVisited) {
+      const nextUnvisited = ALL_STEPS.find((step) => !visitedSteps.has(step)) || 'labs';
+      setValidationError('Please go through all 3 clinical parameter steps before submitting.');
+      setActiveTab(nextUnvisited);
+      setVisitedSteps((prev) => new Set(prev).add(nextUnvisited));
+      return;
+    }
+    setValidationError(null);
+    onSubmit();
+  };
+
   const updateField = (field: keyof ReadmissionPredictionRequest, value: string | number) => {
     if (field === 'patient_name') {
       setIsSearching(true);
       setLoadedNotice(null);
+      if (String(value).trim().length > 0) {
+        setValidationError(null);
+      }
       const valStr = String(value).trim();
       if (valStr.length > 2) {
         const exactMatch = historyRecords.find(
@@ -79,13 +127,19 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
       discharge_disposition: record.discharge_disposition
     });
     setIsSearching(false);
-    setLoadedNotice(`Loaded recorded baseline for ${record.patient_name} (#REC-${record.id})`);
+    setValidationError(null);
+    setActiveTab('demographics');
+    setVisitedSteps(new Set(['demographics']));
+    setLoadedNotice(`Loaded recorded baseline for ${record.patient_name} (#REC-${record.id}). Please review all 3 steps to submit.`);
   };
 
   const handleSelectSampleCase = (sample: SamplePatientCase) => {
     onSelectSample(sample);
     setIsSearching(false);
-    setLoadedNotice(`Loaded preset profile for ${sample.name}`);
+    setValidationError(null);
+    setActiveTab('demographics');
+    setVisitedSteps(new Set(['demographics']));
+    setLoadedNotice(`Loaded preset profile for ${sample.name}. Please review all 3 steps to submit.`);
   };
 
   // Filter existing history records and samples matching query
@@ -123,7 +177,7 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
               <button
                 key={sample.id}
                 type="button"
-                onClick={() => onSelectSample(sample)}
+                onClick={() => handleSelectSampleCase(sample)}
                 className="inline-flex items-center space-x-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-medical-50 hover:border-medical-300 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700/60"
               >
                 <span>{sample.badge}</span>
@@ -137,7 +191,7 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
       <div className="mt-6 flex space-x-2 border-b border-slate-200 pb-3 dark:border-slate-800">
         <button
           type="button"
-          onClick={() => setActiveTab('demographics')}
+          onClick={() => handleTabChange('demographics')}
           className={`flex items-center space-x-2 border-b-2 px-4 py-2 text-sm font-semibold transition ${
             activeTab === 'demographics'
               ? 'border-medical-500 text-medical-600 dark:text-medical-400'
@@ -146,11 +200,12 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
         >
           <User className="h-4 w-4" />
           <span>1. Demographics & History</span>
+          {hasPatientName && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('metrics')}
+          onClick={() => handleTabChange('metrics')}
           className={`flex items-center space-x-2 border-b-2 px-4 py-2 text-sm font-semibold transition ${
             activeTab === 'metrics'
               ? 'border-medical-500 text-medical-600 dark:text-medical-400'
@@ -159,11 +214,12 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
         >
           <Clock className="h-4 w-4" />
           <span>2. Admission & Utilization</span>
+          {visitedSteps.has('metrics') && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('labs')}
+          onClick={() => handleTabChange('labs')}
           className={`flex items-center space-x-2 border-b-2 px-4 py-2 text-sm font-semibold transition ${
             activeTab === 'labs'
               ? 'border-medical-500 text-medical-600 dark:text-medical-400'
@@ -172,27 +228,41 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
         >
           <Activity className="h-4 w-4" />
           <span>3. Clinical Labs & Diagnosis</span>
+          {visitedSteps.has('labs') && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
         </button>
       </div>
 
+      {/* Validation Alert */}
+      {validationError && (
+        <div className="mt-4 flex items-center space-x-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-xs font-semibold text-red-700 dark:text-red-400">
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+          <span>{validationError}</span>
+        </div>
+      )}
+
       {/* Form Body */}
-      <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="mt-6 space-y-6">
+      <form onSubmit={handleFormSubmit} className="mt-6 space-y-6">
         
         {/* Tab 1: Demographics */}
         {activeTab === 'demographics' && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="sm:col-span-2 lg:col-span-3 relative">
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Patient Name / Hospital Record ID (MRN)
+                Patient Name / Hospital Record ID (MRN) <span className="text-red-500">*</span>
               </label>
               <div className="relative mt-2">
                 <input
                   type="text"
+                  required
                   placeholder="Type patient name or MRN to search existing records (e.g. Babatunde O.)..."
                   value={formData.patient_name || ''}
                   onFocus={() => setIsSearching(true)}
                   onChange={(e) => updateField('patient_name', e.target.value)}
-                  className="block w-full rounded-xl border border-slate-200 bg-white p-3 pr-10 text-sm font-medium text-slate-900 focus:border-medical-500 focus:outline-none focus:ring-2 focus:ring-medical-500/20 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                  className={`block w-full rounded-xl border bg-white p-3 pr-10 text-sm font-medium text-slate-900 focus:border-medical-500 focus:outline-none focus:ring-2 focus:ring-medical-500/20 dark:bg-slate-950 dark:text-white ${
+                    validationError && !hasPatientName
+                      ? 'border-red-400 dark:border-red-500/60'
+                      : 'border-slate-200 dark:border-slate-800'
+                  }`}
                 />
                 <Search className="absolute right-3.5 top-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
               </div>
@@ -568,45 +638,59 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
         )}
 
         {/* Submit & Calculate Button */}
-        <div className="pt-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
-          <div className="flex items-center space-x-2">
-            {activeTab !== 'demographics' && (
-              <button
-                type="button"
-                onClick={() => setActiveTab(activeTab === 'labs' ? 'metrics' : 'demographics')}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-              >
-                Previous Step
-              </button>
-            )}
-            {activeTab !== 'labs' && (
-              <button
-                type="button"
-                onClick={() => setActiveTab(activeTab === 'demographics' ? 'metrics' : 'labs')}
-                className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-white"
-              >
-                Next Step
-              </button>
-            )}
-          </div>
+        <div className="pt-4 space-y-3 border-t border-slate-200 dark:border-slate-800">
+          {!canSubmit && (
+            <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center justify-end gap-1.5">
+              <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              <span>
+                {!hasPatientName
+                  ? 'Enter a Patient Name / MRN and go through all 3 steps to submit.'
+                  : `Review all 3 steps (${visitedSteps.size}/3 visited) to enable submission.`}
+              </span>
+            </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="inline-flex items-center space-x-2 rounded-xl bg-medical-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-medical-500/30 transition hover:bg-medical-500 active:scale-95 disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <RefreshCw className="h-4 w-4 animate-spin" />
-                <span>Calculating Risk Score...</span>
-              </>
-            ) : (
-              <>
-                <span>Calculate Readmission Risk</span>
-                <ChevronRight className="h-4 w-4" />
-              </>
-            )}
-          </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              {activeTab !== 'demographics' && (
+                <button
+                  type="button"
+                  onClick={() => handleTabChange(activeTab === 'labs' ? 'metrics' : 'demographics')}
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                >
+                  Previous Step
+                </button>
+              )}
+              {activeTab !== 'labs' && (
+                <button
+                  type="button"
+                  onClick={() => handleTabChange(activeTab === 'demographics' ? 'metrics' : 'labs')}
+                  className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-white"
+                >
+                  Next Step
+                </button>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || !canSubmit}
+              title={!canSubmit ? 'Please enter a patient name and complete all 3 steps first' : 'Calculate Readmission Risk'}
+              className="inline-flex items-center space-x-2 rounded-xl bg-medical-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-medical-500/30 transition hover:bg-medical-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-medical-600 disabled:active:scale-100"
+            >
+              {isLoading ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <span>Calculating Risk Score...</span>
+                </>
+              ) : (
+                <>
+                  <span>Calculate Readmission Risk</span>
+                  <ChevronRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
       </form>
