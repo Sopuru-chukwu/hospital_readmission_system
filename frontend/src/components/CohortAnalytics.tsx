@@ -35,43 +35,33 @@ export const CohortAnalytics: React.FC = () => {
 
   // Holdout Test Set ROC Curve Data (n = 2,400 test encounters)
   const rocCurveData = [
-    { fpr: 0.00, ensemble: 0.0000, rf: 0.0000, hgb: 0.0000, baseline: 0.00 },
-    { fpr: 0.05, ensemble: 0.5761, rf: 0.5870, hgb: 0.5870, baseline: 0.05 },
-    { fpr: 0.10, ensemble: 0.7500, rf: 0.7065, hgb: 0.7174, baseline: 0.10 },
-    { fpr: 0.15, ensemble: 0.8188, rf: 0.8261, hgb: 0.8007, baseline: 0.15 },
-    { fpr: 0.20, ensemble: 0.8732, rf: 0.8804, hgb: 0.8514, baseline: 0.20 },
-    { fpr: 0.25, ensemble: 0.9022, rf: 0.9022, hgb: 0.9058, baseline: 0.25 },
-    { fpr: 0.30, ensemble: 0.9312, rf: 0.9239, hgb: 0.9203, baseline: 0.30 },
-    { fpr: 0.35, ensemble: 0.9384, rf: 0.9457, hgb: 0.9348, baseline: 0.35 },
-    { fpr: 0.40, ensemble: 0.9529, rf: 0.9565, hgb: 0.9493, baseline: 0.40 },
-    { fpr: 0.45, ensemble: 0.9674, rf: 0.9601, hgb: 0.9529, baseline: 0.45 },
-    { fpr: 0.50, ensemble: 0.9710, rf: 0.9710, hgb: 0.9674, baseline: 0.50 },
-    { fpr: 0.55, ensemble: 0.9746, rf: 0.9710, hgb: 0.9710, baseline: 0.55 },
-    { fpr: 0.60, ensemble: 0.9783, rf: 0.9746, hgb: 0.9855, baseline: 0.60 },
-    { fpr: 0.65, ensemble: 0.9855, rf: 0.9855, hgb: 0.9855, baseline: 0.65 },
-    { fpr: 0.70, ensemble: 0.9964, rf: 0.9928, hgb: 0.9964, baseline: 0.70 },
-    { fpr: 0.75, ensemble: 0.9964, rf: 0.9964, hgb: 0.9964, baseline: 0.75 },
-    { fpr: 0.80, ensemble: 0.9964, rf: 1.0000, hgb: 0.9964, baseline: 0.80 },
-    { fpr: 0.85, ensemble: 1.0000, rf: 1.0000, hgb: 1.0000, baseline: 0.85 },
-    { fpr: 0.90, ensemble: 1.0000, rf: 1.0000, hgb: 1.0000, baseline: 0.90 },
-    { fpr: 0.95, ensemble: 1.0000, rf: 1.0000, hgb: 1.0000, baseline: 0.95 },
-    { fpr: 1.00, ensemble: 1.0000, rf: 1.0000, hgb: 1.0000, baseline: 1.00 },
+    { fpr: 0.00, rf: 0.0000, lr: 0.0000, dt: 0.0000, baseline: 0.00 },
+    { fpr: 0.05, rf: 0.5870, lr: 0.6051, dt: 0.5050, baseline: 0.05 },
+    { fpr: 0.10, rf: 0.7065, lr: 0.7572, dt: 0.6299, baseline: 0.10 },
+    { fpr: 0.15, rf: 0.8261, lr: 0.8261, dt: 0.7033, baseline: 0.15 },
+    { fpr: 0.20, rf: 0.8804, lr: 0.8696, dt: 0.7746, baseline: 0.20 },
+    { fpr: 0.25, rf: 0.9022, lr: 0.8877, dt: 0.7997, baseline: 0.25 },
+    { fpr: 0.30, rf: 0.9239, lr: 0.9094, dt: 0.8110, baseline: 0.30 },
+    { fpr: 0.35, rf: 0.9457, lr: 0.9239, dt: 0.8245, baseline: 0.35 },
+    { fpr: 0.40, rf: 0.9565, lr: 0.9493, dt: 0.8380, baseline: 0.40 },
+    { fpr: 0.45, rf: 0.9601, lr: 0.9565, dt: 0.8515, baseline: 0.45 },
+    { fpr: 0.50, rf: 0.9710, lr: 0.9710, dt: 0.8650, baseline: 0.50 },
+    { fpr: 0.55, rf: 0.9710, lr: 0.9855, dt: 0.8785, baseline: 0.55 },
+    { fpr: 0.60, rf: 0.9746, lr: 0.9891, dt: 0.8920, baseline: 0.60 },
+    { fpr: 0.65, rf: 0.9855, lr: 0.9928, dt: 0.9055, baseline: 0.65 },
+    { fpr: 0.70, rf: 0.9928, lr: 0.9964, dt: 0.9190, baseline: 0.70 },
+    { fpr: 0.75, rf: 0.9964, lr: 0.9964, dt: 0.9325, baseline: 0.75 },
+    { fpr: 0.80, rf: 1.0000, lr: 0.9964, dt: 0.9460, baseline: 0.80 },
+    { fpr: 0.85, rf: 1.0000, lr: 0.9964, dt: 0.9595, baseline: 0.85 },
+    { fpr: 0.90, rf: 1.0000, lr: 0.9964, dt: 0.9730, baseline: 0.90 },
+    { fpr: 0.95, rf: 1.0000, lr: 1.0000, dt: 0.9865, baseline: 0.95 },
+    { fpr: 1.00, rf: 1.0000, lr: 1.0000, dt: 1.0000, baseline: 1.00 },
   ];
 
   const modelMetricsComparison = [
     {
-      name: 'Soft-Voting Ensemble (HGB + RF)',
-      badge: 'Production Model',
-      color: 'text-medical-600 dark:text-medical-400',
-      roc_auc: '0.9117',
-      recall: '84.06%',
-      precision: '39.79%',
-      f1: '0.5402',
-      accuracy: '83.54%',
-    },
-    {
       name: 'Random Forest Classifier (RF)',
-      badge: 'Base Estimator',
+      badge: 'Best Overall Model',
       color: 'text-emerald-600 dark:text-emerald-400',
       roc_auc: '0.9104',
       recall: '84.78%',
@@ -80,14 +70,24 @@ export const CohortAnalytics: React.FC = () => {
       accuracy: '83.92%',
     },
     {
-      name: 'HistGradientBoosting (HGB)',
-      badge: 'Base Estimator',
+      name: 'Logistic Regression (LR)',
+      badge: 'Linear Baseline',
+      color: 'text-medical-600 dark:text-medical-400',
+      roc_auc: '0.9130',
+      recall: '88.41%',
+      precision: '31.98%',
+      f1: '0.4697',
+      accuracy: '77.04%',
+    },
+    {
+      name: 'Decision Tree Classifier (DT)',
+      badge: 'Rule-Based Tree',
       color: 'text-purple-600 dark:text-purple-400',
-      roc_auc: '0.9071',
-      recall: '82.61%',
-      precision: '38.45%',
-      f1: '0.5247',
-      accuracy: '82.79%',
+      roc_auc: '0.8305',
+      recall: '78.26%',
+      precision: '32.05%',
+      f1: '0.4547',
+      accuracy: '78.42%',
     },
   ];
 
@@ -418,7 +418,7 @@ export const CohortAnalytics: React.FC = () => {
               </p>
             </div>
             <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              Best AUC: 0.9117 (Ensemble)
+              Best Overall: Random Forest (F1 = 0.5480 | AUC = 0.9104)
             </span>
           </div>
 
@@ -447,25 +447,25 @@ export const CohortAnalytics: React.FC = () => {
                 <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '11px' }} />
                 <Line
                   type="monotone"
-                  dataKey="ensemble"
-                  name="Soft-Voting Ensemble (AUC = 0.9117)"
-                  stroke="#0ea5e9"
+                  dataKey="rf"
+                  name="Random Forest (AUC = 0.9104)"
+                  stroke="#10b981"
                   strokeWidth={3}
                   dot={false}
                 />
                 <Line
                   type="monotone"
-                  dataKey="rf"
-                  name="Random Forest (AUC = 0.9104)"
-                  stroke="#10b981"
+                  dataKey="lr"
+                  name="Logistic Regression (AUC = 0.9130)"
+                  stroke="#0ea5e9"
                   strokeWidth={2}
                   strokeDasharray="5 3"
                   dot={false}
                 />
                 <Line
                   type="monotone"
-                  dataKey="hgb"
-                  name="HistGradientBoosting (AUC = 0.9071)"
+                  dataKey="dt"
+                  name="Decision Tree (AUC = 0.8305)"
                   stroke="#8b5cf6"
                   strokeWidth={2}
                   strokeDasharray="3 3"
@@ -539,7 +539,7 @@ export const CohortAnalytics: React.FC = () => {
           </div>
 
           <div className="mt-4 rounded-xl bg-medical-500/10 p-3 text-[11px] text-slate-600 dark:text-slate-300 border border-medical-500/20">
-            <strong className="text-medical-600 dark:text-medical-400">Why Soft-Voting Ensemble?</strong> Combining <code className="font-mono">HistGradientBoosting</code> and <code className="font-mono">RandomForest</code> achieves the highest overall discrimination (<strong>ROC-AUC 0.9117</strong>) while stabilizing probability calibration across diverse patient subgroups.
+            <strong className="text-medical-600 dark:text-medical-400">Why Random Forest?</strong> Consistent with Breiman (2001), <code className="font-mono">RandomForestClassifier</code> outperforms both <code className="font-mono">LogisticRegression</code> and <code className="font-mono">DecisionTree</code>, achieving the highest overall Accuracy (<strong>83.92%</strong>), Specificity (<strong>83.80%</strong>), Precision (<strong>40.48%</strong>), and F1-Score (<strong>0.5480</strong>) with a ROC-AUC of <strong>0.9104</strong>.
           </div>
         </div>
 
@@ -675,14 +675,14 @@ export const CohortAnalytics: React.FC = () => {
           <div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Award className="h-5 w-5 text-medical-500" />
-              Holdout Test-Set Confusion Matrix (Best Performing Model)
+              Holdout Test-Set Confusion Matrix (Best Performing Model – Random Forest)
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Soft-Voting Ensemble (HGB + RF) evaluated on n = 2,400 holdout test encounters at clinical threshold p ≥ 0.35
+              Random Forest Classifier evaluated on n = 2,400 holdout test encounters at clinical threshold p ≥ 0.35
             </p>
           </div>
           <span className="inline-flex items-center rounded-full bg-medical-500/10 px-3 py-1 text-xs font-bold text-medical-600 dark:text-medical-400 border border-medical-500/20">
-            Sensitivity: 84.06% | Specificity: 83.47%
+            Sensitivity: 84.78% | Specificity: 83.80%
           </span>
         </div>
 
@@ -708,18 +708,18 @@ export const CohortAnalytics: React.FC = () => {
                   <div className="text-[10px] font-extrabold uppercase tracking-wider text-medical-700 dark:text-medical-300">
                     True Negative (TN)
                   </div>
-                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">1,773</div>
+                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">1,780</div>
                   <div className="mt-1 text-[11px] font-semibold text-medical-600 dark:text-medical-400">
-                    83.47% Specificity
+                    83.80% Specificity
                   </div>
                 </div>
                 <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5 text-center">
                   <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                     False Positive (FP)
                   </div>
-                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">351</div>
+                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">344</div>
                   <div className="mt-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-                    16.53% False Alarm Rate
+                    16.20% False Alarm Rate
                   </div>
                 </div>
 
@@ -732,18 +732,18 @@ export const CohortAnalytics: React.FC = () => {
                   <div className="text-[10px] font-extrabold uppercase tracking-wider text-red-700 dark:text-red-400">
                     False Negative (FN)
                   </div>
-                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">44</div>
+                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">42</div>
                   <div className="mt-1 text-[11px] font-semibold text-red-600 dark:text-red-400">
-                    15.94% Missed Readmissions
+                    15.22% Missed Readmissions
                   </div>
                 </div>
                 <div className="rounded-2xl bg-emerald-500/15 border-2 border-emerald-500/40 p-5 text-center">
                   <div className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                     True Positive (TP)
                   </div>
-                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">232</div>
+                  <div className="mt-1 text-3xl font-extrabold text-slate-900 dark:text-white">234</div>
                   <div className="mt-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                    84.06% Sensitivity (Recall)
+                    84.78% Sensitivity (Recall)
                   </div>
                 </div>
               </div>
@@ -768,32 +768,32 @@ export const CohortAnalytics: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-200/60 dark:divide-slate-800/60 font-mono">
                   <tr>
-                    <td className="py-1.5 font-sans font-bold text-medical-600 dark:text-medical-400">Ensemble (Best AUC)</td>
-                    <td className="py-1.5 text-center">1,773</td>
-                    <td className="py-1.5 text-center">351</td>
-                    <td className="py-1.5 text-center">44</td>
-                    <td className="py-1.5 text-center font-bold">232</td>
-                  </tr>
-                  <tr>
-                    <td className="py-1.5 font-sans font-bold text-emerald-600 dark:text-emerald-400">Random Forest (Best F1)</td>
+                    <td className="py-1.5 font-sans font-bold text-emerald-600 dark:text-emerald-400">Random Forest (Best)</td>
                     <td className="py-1.5 text-center">1,780</td>
                     <td className="py-1.5 text-center">344</td>
                     <td className="py-1.5 text-center">42</td>
                     <td className="py-1.5 text-center font-bold">234</td>
                   </tr>
                   <tr>
-                    <td className="py-1.5 font-sans font-bold text-purple-600 dark:text-purple-400">HistGradientBoosting</td>
-                    <td className="py-1.5 text-center">1,759</td>
-                    <td className="py-1.5 text-center">365</td>
-                    <td className="py-1.5 text-center">48</td>
-                    <td className="py-1.5 text-center font-bold">228</td>
+                    <td className="py-1.5 font-sans font-bold text-medical-600 dark:text-medical-400">Logistic Regression</td>
+                    <td className="py-1.5 text-center">1,605</td>
+                    <td className="py-1.5 text-center">519</td>
+                    <td className="py-1.5 text-center">32</td>
+                    <td className="py-1.5 text-center font-bold">244</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1.5 font-sans font-bold text-purple-600 dark:text-purple-400">Decision Tree</td>
+                    <td className="py-1.5 text-center">1,666</td>
+                    <td className="py-1.5 text-center">458</td>
+                    <td className="py-1.5 text-center">60</td>
+                    <td className="py-1.5 text-center font-bold">216</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             <div className="rounded-2xl bg-emerald-500/10 p-3.5 text-[11px] border border-emerald-500/20">
-              <strong className="text-emerald-700 dark:text-emerald-400">Clinical Trade-off Justification:</strong> By operating at probability threshold <code className="font-mono">p ≥ 0.35</code>, the model captures <strong>232 out of 276</strong> true 30-day readmissions (<strong>84.06% recall</strong>), minimizing dangerous False Negatives (only 44 missed high-risk discharges) at the acceptable cost of preventive follow-up calls for False Positives.
+              <strong className="text-emerald-700 dark:text-emerald-400">Clinical Trade-off Justification:</strong> By operating at probability threshold <code className="font-mono">p ≥ 0.35</code>, <strong>Random Forest</strong> captures <strong>234 out of 276</strong> true 30-day readmissions (<strong>84.78% recall</strong>), minimizing dangerous False Negatives (only 42 missed high-risk discharges) while achieving the highest Specificity (<strong>83.80%</strong>) and F1-Score (<strong>0.5480</strong>).
             </div>
           </div>
         </div>

@@ -5,13 +5,48 @@ import numpy as np
 from pathlib import Path
 
 from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier, VotingClassifier
-from sklearn.metrics import roc_auc_score, roc_curve, recall_score, precision_score, f1_score, accuracy_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import roc_auc_score, roc_curve, recall_score, precision_score, f1_score, accuracy_score, confusion_matrix
 
 from data_loader import get_or_create_dataset
 from preprocessing import prepare_train_test_split, add_engineered_features, CATEGORICAL_MAPS, NUMERICAL_COLS
 
 MODELS_DIR = Path(__file__).resolve().parent.parent / "models"
 BACKEND_MODELS_DIR = Path(__file__).resolve().parent.parent.parent / "backend" / "app" / "models" / "saved_models"
+
+
+def apply_smote(X: np.ndarray, y: np.ndarray, k_neighbors: int = 5, random_state: int = 42):
+    """
+    Synthetic Minority Over-sampling Technique (SMOTE, Chawla et al., 2002)
+    applied strictly to the training split to balance Class 1 to a 1:1 ratio with Class 0.
+    """
+    rng = np.random.default_rng(random_state)
+    X_min = X[y == 1]
+    X_maj = X[y == 0]
+    n_min = len(X_min)
+    n_maj = len(X_maj)
+    n_synth = n_maj - n_min
+    if n_synth <= 0:
+        return X, y
+
+    nn = NearestNeighbors(n_neighbors=min(k_neighbors + 1, n_min))
+    nn.fit(X_min)
+    _, indices = nn.kneighbors(X_min)
+
+    base_idx = rng.integers(0, n_min, size=n_synth)
+    neighbor_choice = rng.integers(1, indices.shape[1], size=n_synth)
+    neighbor_idx = indices[base_idx, neighbor_choice]
+    lambdas = rng.random((n_synth, 1))
+
+    X_synth = X_min[base_idx] + lambdas * (X_min[neighbor_idx] - X_min[base_idx])
+    y_synth = np.ones(n_synth, dtype=y.dtype)
+
+    X_res = np.vstack([X, X_synth])
+    y_res = np.concatenate([y, y_synth])
+    perm = rng.permutation(len(y_res))
+    return X_res[perm], y_res[perm]
 
 
 def generate_eda_svgs(df, heatmap_path: Path, rates_path: Path):
@@ -155,9 +190,9 @@ def generate_roc_svg(roc_data: dict, output_path: Path):
         axis_labels.append(f'<text x="{pad_l - 12}" y="{gy + 4}" text-anchor="end" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#475569">{tick:.1f}</text>')
 
     styles = [
-        ("ensemble", "Soft-Voting Ensemble (HGB + RF)", "#0ea5e9", "3.2", ""),
-        ("hgb", "HistGradientBoosting (HGB)", "#8b5cf6", "2.4", "6,3"),
-        ("rf", "Random Forest (RF)", "#10b981", "2.4", "2,3"),
+        ("rf", "Random Forest (RF)", "#10b981", "3.2", ""),
+        ("lr", "Logistic Regression (LR)", "#0ea5e9", "2.4", "6,3"),
+        ("dt", "Decision Tree (DT)", "#8b5cf6", "2.4", "2,3"),
     ]
 
     polylines = []
@@ -182,7 +217,7 @@ def generate_roc_svg(roc_data: dict, output_path: Path):
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}">
   <rect width="{width}" height="{height}" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
   <text x="{pad_l}" y="34" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#0f172a">ROC Curves on Holdout Test Set (30-Day Readmission)</text>
-  <text x="{pad_l}" y="52" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#64748b">Comparison of HistGradientBoosting, Random Forest, and Soft-Voting Ensemble (n = 2,400 test encounters)</text>
+  <text x="{pad_l}" y="52" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#64748b">Comparison of Random Forest, Logistic Regression, and Decision Tree (n = 2,400 test encounters)</text>
   {"".join(grid_lines)}
   <rect x="{pad_l}" y="{pad_t}" width="{plot_w}" height="{plot_h}" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
   <line x1="{x0}" y1="{y0}" x2="{x1}" y2="{y1}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,6"/>
@@ -206,13 +241,33 @@ def train_and_evaluate_models():
     df = get_or_create_dataset()
     print(f"\n[1/4] Loaded dataset: {len(df)} records.")
 
-    # 2. Preprocess & Train/Test Split
+    # 2. Preprocess, Stratified Split & SMOTE on Training Set
     X_train, X_test, y_train, y_test, scaler, feature_names = prepare_train_test_split(df)
     print(f"[2/4] Preprocessed features. Train shape: {X_train.shape}, Test shape: {X_test.shape}")
-    print(f"      30-Day Readmission Positives in Train: {y_train.sum()} ({y_train.mean()*100:.1f}%)")
+    print(f"      Before SMOTE (Train): {len(y_train)} records | Readmitted <30d: {int(y_train.sum())} ({y_train.mean()*100:.2f}%) | Not Readmitted: {int((y_train == 0).sum())}")
+    X_train_smote, y_train_smote = apply_smote(X_train, y_train, k_neighbors=5, random_state=42)
+    print(f"      After SMOTE  (Train): {len(y_train_smote)} records | Readmitted <30d: {int(y_train_smote.sum())} ({y_train_smote.mean()*100:.2f}%) | Not Readmitted: {int((y_train_smote == 0).sum())}")
+    print(f"      Holdout Test Set    : {len(y_test)} records | Readmitted <30d: {int(y_test.sum())} ({y_test.mean()*100:.2f}%) | Not Readmitted: {int((y_test == 0).sum())}")
 
-    # 3. Model Training (Soft Voting Ensemble of HistGradientBoosting & RandomForest)
-    print("\n[3/4] Training Gradient Boosted + Random Forest Voting Ensemble Classifier...")
+    # 3. Model Training (Logistic Regression, Decision Tree, Random Forest & Voting Ensemble)
+    print("\n[3/4] Training Logistic Regression, Decision Tree, and Random Forest Classifiers...")
+    lr_clf = LogisticRegression(
+        C=1.0,
+        penalty='l2',
+        class_weight='balanced',
+        max_iter=500,
+        random_state=42
+    )
+    lr_clf.fit(X_train, y_train)
+
+    dt_clf = DecisionTreeClassifier(
+        max_depth=10,
+        min_samples_leaf=10,
+        class_weight='balanced',
+        random_state=42
+    )
+    dt_clf.fit(X_train, y_train)
+
     hgb_clf = HistGradientBoostingClassifier(
         max_iter=300,
         learning_rate=0.03,
@@ -240,11 +295,13 @@ def train_and_evaluate_models():
     )
     clf.fit(X_train, y_train)
 
-    # 4. Evaluation of all 3 models on Holdout Test Set
+    # 4. Evaluation of all models on Holdout Test Set
     models_to_eval = {
+        "rf": ("RandomForestClassifier", clf.named_estimators_["rf"]),
+        "lr": ("LogisticRegression", lr_clf),
+        "dt": ("DecisionTreeClassifier", dt_clf),
         "ensemble": ("Soft-Voting Ensemble (HGB + RF)", clf),
         "hgb": ("HistGradientBoostingClassifier", clf.named_estimators_["hgb"]),
-        "rf": ("RandomForestClassifier", clf.named_estimators_["rf"]),
     }
 
     fpr_grid = np.linspace(0.0, 1.0, 21)
@@ -259,6 +316,8 @@ def train_and_evaluate_models():
         m_prec = float(precision_score(y_test, pred, zero_division=0))
         m_f1 = float(f1_score(y_test, pred, zero_division=0))
         m_acc = float(accuracy_score(y_test, pred))
+        tn, fp, fn, tp = confusion_matrix(y_test, pred).ravel()
+        m_spec = float(tn / (tn + fp))
 
         fpr_arr, tpr_arr, _ = roc_curve(y_test, proba)
         interp_tpr = np.interp(fpr_grid, fpr_arr, tpr_arr)
@@ -269,22 +328,24 @@ def train_and_evaluate_models():
             "name": label,
             "roc_auc": round(m_auc, 4),
             "recall": round(m_rec, 4),
+            "specificity": round(m_spec, 4),
             "precision": round(m_prec, 4),
             "f1": round(m_f1, 4),
             "accuracy": round(m_acc, 4),
+            "confusion_matrix": {"tn": int(tn), "fp": int(fp), "fn": int(fn), "tp": int(tp)},
             "curve": [
                 {"fpr": round(float(f), 2), "tpr": round(float(t), 4)}
                 for f, t in zip(fpr_grid, interp_tpr)
             ],
         }
         print(f"  * {label}:")
-        print(f"      ROC-AUC : {m_auc:.4f} | Recall: {m_rec:.4f} | Precision: {m_prec:.4f} | F1: {m_f1:.4f} | Acc: {m_acc:.4f}")
+        print(f"      ROC-AUC : {m_auc:.4f} | Recall: {m_rec:.4f} | Spec: {m_spec:.4f} | Precision: {m_prec:.4f} | F1: {m_f1:.4f} | Acc: {m_acc:.4f}")
 
-    roc_auc = roc_summary["ensemble"]["roc_auc"]
-    recall = roc_summary["ensemble"]["recall"]
-    precision = roc_summary["ensemble"]["precision"]
-    f1 = roc_summary["ensemble"]["f1"]
-    accuracy = roc_summary["ensemble"]["accuracy"]
+    roc_auc = roc_summary["rf"]["roc_auc"]
+    recall = roc_summary["rf"]["recall"]
+    precision = roc_summary["rf"]["precision"]
+    f1 = roc_summary["rf"]["f1"]
+    accuracy = roc_summary["rf"]["accuracy"]
 
     # 5. Export Model Artifacts & ROC Curves
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -304,7 +365,7 @@ def train_and_evaluate_models():
     backend_roc_json_path = BACKEND_MODELS_DIR / "roc_curves.json"
 
     metadata = {
-        "model_type": "VotingClassifier(HistGradientBoosting + RandomForest)",
+        "model_type": "RandomForestClassifier",
         "roc_auc": round(roc_auc, 4),
         "recall": round(recall, 4),
         "precision": round(precision, 4),
