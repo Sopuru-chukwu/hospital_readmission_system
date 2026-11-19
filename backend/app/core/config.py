@@ -1,23 +1,30 @@
 import json
 import os
 from pathlib import Path
-from typing import List, Union
-from pydantic import BeforeValidator
+from typing import Any, List, Union
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing_extensions import Annotated
 
 # Resolve absolute path to backend/.env
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_FILE_PATH = BASE_DIR / ".env"
 
-def parse_cors_origins(v: Union[str, List[str]]) -> List[str]:
-    if isinstance(v, str) and not v.startswith("["):
-        return [i.strip() for i in v.split(",") if i.strip()]
-    elif isinstance(v, str) and v.startswith("["):
-        return json.loads(v)
-    elif isinstance(v, list):
-        return v
-    raise ValueError(v)
+def parse_cors_origins(v: Any) -> List[str]:
+    if isinstance(v, list):
+        return [str(i).strip() for i in v if str(i).strip()]
+    if not isinstance(v, str):
+        return ["*"]
+    s = v.strip().strip("'").strip('"')
+    if not s:
+        return ["*"]
+    if s.startswith("["):
+        try:
+            parsed = json.loads(s)
+            if isinstance(parsed, list):
+                return [str(i).strip() for i in parsed if str(i).strip()]
+        except Exception:
+            s = s.strip("[]")
+    return [i.strip().strip("'").strip('"') for i in s.split(",") if i.strip().strip("'").strip('"')]
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -35,8 +42,18 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "postgresql://postgres:postgres_password@localhost:5432/hospital_readmission"
 
-    BACKEND_CORS_ORIGINS: Annotated[
-        List[str], BeforeValidator(parse_cors_origins)
-    ] = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"]
+    BACKEND_CORS_ORIGINS: Any = [
+        "https://diapredict-ai.netlify.app",
+        "http://diapredict-ai.netlify.app",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
+    @model_validator(mode="after")
+    def _normalize_cors_origins(self) -> "Settings":
+        self.BACKEND_CORS_ORIGINS = parse_cors_origins(self.BACKEND_CORS_ORIGINS)
+        return self
 
 settings = Settings()

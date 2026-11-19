@@ -3,8 +3,9 @@ import os
 
 # Gunicorn Production WSGI Server Configuration
 
-bind = os.getenv("GUNICORN_BIND", "0.0.0.0:8000")
-workers = int(os.getenv("GUNICORN_WORKERS", multiprocessing.cpu_count() * 2 + 1))
+port = os.getenv("PORT", "8000")
+bind = os.getenv("GUNICORN_BIND", f"0.0.0.0:{port}")
+workers = int(os.getenv("GUNICORN_WORKERS", os.getenv("WEB_CONCURRENCY", "2")))
 worker_class = "uvicorn.workers.UvicornWorker"
 
 # Timeout & Keepalive
