@@ -553,7 +553,7 @@ function App() {
                   </p>
                 </div>
                 <a
-                  href="http://localhost:8000/docs"
+                  href={`${(import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1').replace(/\/api\/v1\/?$/, '')}/docs`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center space-x-2 rounded-xl bg-medical-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-medical-500"
