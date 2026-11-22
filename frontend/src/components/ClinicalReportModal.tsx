@@ -29,24 +29,24 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-2 sm:p-4 backdrop-blur-sm overflow-y-auto">
       
       {/* Modal Card Container */}
-      <div className="relative w-full max-w-4xl rounded-3xl bg-white p-8 shadow-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto print:max-h-none print:overflow-visible print:p-0 print:border-none print:shadow-none">
+      <div className="relative w-full max-w-4xl rounded-2xl sm:rounded-3xl bg-white p-4 sm:p-8 shadow-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-h-[92vh] overflow-y-auto print:max-h-none print:overflow-visible print:p-0 print:border-none print:shadow-none">
         
         {/* Action Controls (Hidden when printing) */}
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800 print:hidden">
-          <div className="flex items-center space-x-2 text-medical-600 dark:text-medical-400 font-bold text-sm">
-            <FileText className="h-5 w-5" />
-            <span>Clinical EHR Discharge Assessment Report</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-4 dark:border-slate-800 print:hidden">
+          <div className="flex items-center space-x-2 text-medical-600 dark:text-medical-400 font-bold text-xs sm:text-sm">
+            <FileText className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+            <span>Clinical EHR Discharge Report</span>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={handlePrint}
-              className="inline-flex items-center space-x-2 rounded-xl bg-medical-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-medical-500 transition"
+              className="inline-flex items-center space-x-1.5 sm:space-x-2 rounded-xl bg-medical-600 px-3 sm:px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-medical-500 transition"
             >
-              <Printer className="h-4 w-4" />
-              <span>Print / Save as PDF</span>
+              <Printer className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>Print / PDF</span>
             </button>
             <button
               onClick={onClose}
@@ -58,20 +58,20 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
         </div>
 
         {/* Printable EHR Report Paper Sheet */}
-        <div id="printable-ehr-report" className="mt-6 space-y-6 text-slate-900 dark:text-slate-100 print:mt-0 print:text-black">
+        <div id="printable-ehr-report" className="mt-5 sm:mt-6 space-y-5 sm:space-y-6 text-slate-900 dark:text-slate-100 print:mt-0 print:text-black">
           
           {/* Hospital & Report Header */}
-          <div className="flex items-start justify-between border-b-2 border-slate-900 pb-6 dark:border-slate-700">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b-2 border-slate-900 pb-5 sm:pb-6 dark:border-slate-700">
             <div>
-              <div className="flex items-center space-x-2 text-medical-700 dark:text-medical-400 font-extrabold text-xl tracking-tight">
-                <Activity className="h-6 w-6" />
+              <div className="flex items-center space-x-2 text-medical-700 dark:text-medical-400 font-extrabold text-lg sm:text-xl tracking-tight">
+                <Activity className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
                 <span>DiaPredict<span className="text-slate-900 dark:text-white">.AI Health Network</span></span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Clinical Decision Support System (CDSS) • Diabetic Readmission Risk Evaluation
               </p>
             </div>
-            <div className="text-right text-xs text-slate-500 dark:text-slate-400">
+            <div className="sm:text-right text-xs text-slate-500 dark:text-slate-400">
               <div className="font-bold text-slate-800 dark:text-slate-200">CONFIDENTIAL MEDICAL RECORD</div>
               <div className="mt-0.5">Date: {currentDate}</div>
               <div>Report ID: #EHR-2026-{Math.floor(1000 + Math.random() * 9000)}</div>
@@ -139,14 +139,14 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
           </div>
 
           {/* Risk Score Summary Banner */}
-          <div className="rounded-2xl border border-slate-300 p-5 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
-            <div className="flex items-center justify-between">
+          <div className="rounded-2xl border border-slate-300 p-4 sm:p-5 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Evaluated 30-Day Readmission Risk Probability
                 </span>
-                <div className="flex items-baseline space-x-3 mt-1">
-                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white">
+                <div className="flex flex-wrap items-baseline gap-2 sm:space-x-3 mt-1">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
                     {prediction.readmission_risk_score}%
                   </span>
                   <span className="text-xs font-semibold text-slate-500">
@@ -155,7 +155,7 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
                 </div>
               </div>
 
-              <div className="text-right">
+              <div className="sm:text-right">
                 <span className={`inline-flex items-center space-x-1 rounded-full px-3 py-1 text-xs font-extrabold border ${
                   prediction.risk_level === 'High' ? 'bg-red-500/10 text-red-600 border-red-500/30' :
                   prediction.risk_level === 'Moderate' ? 'bg-amber-500/10 text-amber-600 border-amber-500/30' :
@@ -178,13 +178,13 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
             </h4>
             <div className="space-y-2 text-xs">
               {prediction.feature_impacts.map((feat, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded-xl border border-slate-200 p-2.5 dark:border-slate-800">
+                <div key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-xl border border-slate-200 p-2.5 dark:border-slate-800">
                   <div>
                     <span className="font-bold text-slate-900 dark:text-white">{feat.feature_name}</span>
                     <span className="text-slate-500 text-[11px] ml-2">({feat.feature_value})</span>
                     <p className="text-[11px] text-slate-500 mt-0.5">{feat.description}</p>
                   </div>
-                  <span className={`font-bold px-2 py-0.5 rounded ${
+                  <span className={`self-start sm:self-auto shrink-0 font-bold px-2 py-0.5 rounded ${
                     feat.direction === 'increase' ? 'text-red-600 bg-red-50 dark:bg-red-950/40' : 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40'
                   }`}>
                     {feat.impact_score > 0 ? `+${feat.impact_score}` : feat.impact_score}%
@@ -224,7 +224,7 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">
               Clinical Attestation & Discharge Verification
             </h4>
-            <div className="grid grid-cols-2 gap-8 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs">
               <div>
                 <div className="h-10 border-b border-dashed border-slate-400"></div>
                 <div className="mt-1 font-bold text-slate-800 dark:text-slate-200">Attending Physician Signature</div>

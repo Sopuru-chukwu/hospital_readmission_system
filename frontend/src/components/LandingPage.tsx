@@ -26,32 +26,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   currentUser
 }) => {
   return (
-    <div className="space-y-16 py-4">
+    <div className="space-y-10 sm:space-y-16 py-2 sm:py-4">
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-medical-950 p-8 sm:p-12 text-white shadow-2xl">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-medical-950 p-6 sm:p-12 text-white shadow-2xl">
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-medical-500/10 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
         
-        <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="inline-flex items-center space-x-2 rounded-full bg-medical-500/20 px-4 py-1.5 text-xs font-bold text-medical-300 border border-medical-500/30 backdrop-blur-md">
-            <Sparkles className="h-4 w-4 text-amber-400" />
+        <div className="relative z-10 max-w-3xl space-y-5 sm:space-y-6">
+          <div className="inline-flex items-center space-x-2 rounded-full bg-medical-500/20 px-3.5 py-1.5 text-[11px] sm:text-xs font-bold text-medical-300 border border-medical-500/30 backdrop-blur-md">
+            <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-400 shrink-0" />
             <span>AI Clinical Decision Support • NDPR & HIPAA Compliant</span>
           </div>
 
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl leading-[1.15]">
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl leading-[1.15]">
             Prevent 30-Day Diabetic Readmissions <span className="bg-gradient-to-r from-medical-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">Before They Happen</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
+          <p className="text-sm sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
             Precision AI-driven readmission risk scoring, intervention simulation, and 7-day PHC follow-up care pathways tailored for Nigerian clinical encounters and international healthcare institutions.
           </p>
 
           {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 pt-2 sm:pt-4">
             <button
               onClick={() => onNavigateTab('predictor')}
-              className="inline-flex items-center space-x-2 rounded-xl bg-medical-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-medical-600/30 hover:bg-medical-500 active:scale-95 transition"
+              className="inline-flex items-center justify-center space-x-2 rounded-xl bg-medical-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-medical-600/30 hover:bg-medical-500 active:scale-95 transition"
             >
               <Stethoscope className="h-5 w-5" />
               <span>Launch Patient Predictor</span>
@@ -61,15 +61,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {!currentUser ? (
               <button
                 onClick={onOpenAuth}
-                className="inline-flex items-center space-x-2 rounded-xl bg-white/10 px-6 py-3.5 text-sm font-bold text-white border border-white/20 hover:bg-white/20 active:scale-95 transition backdrop-blur-md"
+                className="inline-flex items-center justify-center space-x-2 rounded-xl bg-white/10 px-6 py-3.5 text-sm font-bold text-white border border-white/20 hover:bg-white/20 active:scale-95 transition backdrop-blur-md"
               >
                 <UserCheck className="h-5 w-5 text-emerald-400" />
-                <span>Clinical Sign In / Demo Profiles</span>
+                <span>Clinical Sign In</span>
               </button>
             ) : (
               <button
                 onClick={() => onNavigateTab('history')}
-                className="inline-flex items-center space-x-2 rounded-xl bg-white/10 px-6 py-3.5 text-sm font-bold text-white border border-white/20 hover:bg-white/20 active:scale-95 transition backdrop-blur-md"
+                className="inline-flex items-center justify-center space-x-2 rounded-xl bg-white/10 px-6 py-3.5 text-sm font-bold text-white border border-white/20 hover:bg-white/20 active:scale-95 transition backdrop-blur-md"
               >
                 <FileSpreadsheet className="h-5 w-5 text-medical-300" />
                 <span>View Patient Records</span>

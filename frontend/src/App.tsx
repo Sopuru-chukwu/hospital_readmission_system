@@ -209,17 +209,17 @@ function App() {
       
       {/* Top Banner / Navbar */}
       <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-950/80">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8 gap-2">
           
           {/* Logo & Workspace Title */}
           <div 
             onClick={() => setActiveTab('landing')}
-            className="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition"
+            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer hover:opacity-90 transition shrink-0"
           >
-            <div className="rounded-xl bg-medical-500/10 p-2 text-medical-600 dark:text-medical-400">
-              <Activity className="h-6 w-6 animate-pulse" />
+            <div className="rounded-xl bg-medical-500/10 p-1.5 sm:p-2 text-medical-600 dark:text-medical-400">
+              <Activity className="h-5 w-5 sm:h-6 sm:w-6 animate-pulse" />
             </div>
-            <span className="font-sans text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <span className="font-sans text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               DiaPredict<span className="text-medical-500">.AI</span>
             </span>
           </div>
@@ -372,7 +372,7 @@ function App() {
 
 
       {/* Main Container */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-3 py-5 sm:px-6 sm:py-8 lg:px-8 overflow-x-hidden">
         
         {/* Render Landing Overview when NO user is signed in */}
         {!currentUser ? (
@@ -384,54 +384,59 @@ function App() {
         ) : (
           <>
             {/* Mobile Tab Switcher (Only rendered when user is signed in) */}
-            <div className="flex md:hidden mb-6 space-x-1 rounded-xl bg-slate-200 p-1 dark:bg-slate-900 overflow-x-auto">
+            <div className="grid grid-cols-2 sm:flex md:hidden mb-6 gap-1.5 rounded-2xl bg-slate-200/80 p-1.5 dark:bg-slate-900">
               <button
                 onClick={() => setActiveTab('predictor')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'predictor' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+                className={`flex items-center justify-center space-x-1.5 py-2.5 text-xs font-bold rounded-xl px-3 transition ${activeTab === 'predictor' ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400' : 'text-slate-600 dark:text-slate-400'}`}
               >
-                Predictor
+                <Stethoscope className="h-3.5 w-3.5 shrink-0" />
+                <span>Predictor</span>
               </button>
               <button
                 onClick={() => setActiveTab('batch')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'batch' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+                className={`flex items-center justify-center space-x-1.5 py-2.5 text-xs font-bold rounded-xl px-3 transition ${activeTab === 'batch' ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400' : 'text-slate-600 dark:text-slate-400'}`}
               >
-                Batch
+                <UploadCloud className="h-3.5 w-3.5 shrink-0" />
+                <span>Batch</span>
               </button>
               <button
                 onClick={() => setActiveTab('history')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'history' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+                className={`flex items-center justify-center space-x-1.5 py-2.5 text-xs font-bold rounded-xl px-3 transition ${activeTab === 'history' ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400' : 'text-slate-600 dark:text-slate-400'}`}
               >
-                History
+                <FileSpreadsheet className="h-3.5 w-3.5 shrink-0" />
+                <span>History</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('analytics')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'analytics' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+                className={`flex items-center justify-center space-x-1.5 py-2.5 text-xs font-bold rounded-xl px-3 transition ${activeTab === 'analytics' ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400' : 'text-slate-600 dark:text-slate-400'}`}
               >
-                Cohort
+                <BarChart3 className="h-3.5 w-3.5 shrink-0" />
+                <span>Cohort</span>
               </button>
               {canAccessDevTools && devMode && (
                 <button
                   onClick={() => setActiveTab('system')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg px-2 ${activeTab === 'system' ? 'bg-white text-medical-600 dark:bg-slate-800 dark:text-medical-400' : ''}`}
+                  className={`col-span-2 flex items-center justify-center space-x-1.5 py-2.5 text-xs font-bold rounded-xl px-3 transition ${activeTab === 'system' ? 'bg-white text-medical-600 shadow-sm dark:bg-slate-800 dark:text-medical-400' : 'text-slate-600 dark:text-slate-400'}`}
                 >
-                  Dev API
+                  <Server className="h-3.5 w-3.5 shrink-0" />
+                  <span>Dev API</span>
                 </button>
               )}
             </div>
 
         {/* Tab 1: Predictor Workspace */}
         {activeTab === 'predictor' && (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             
             {/* Workspace Hero Banner */}
-            <div className="relative rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-medical-950 p-8 text-white shadow-2xl overflow-hidden">
+            <div className="relative rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-medical-950 p-5 sm:p-8 text-white shadow-2xl overflow-hidden">
               <div className="relative z-10 max-w-2xl">
-                <span className="inline-flex items-center space-x-2 rounded-full bg-medical-500/20 px-3.5 py-1 text-xs font-bold text-medical-300 border border-medical-500/30">
-                  <Stethoscope className="h-3.5 w-3.5" />
-                  <span>Clinical Decision Support System (Nigerian & International Demographic)</span>
+                <span className="inline-flex items-center space-x-2 rounded-full bg-medical-500/20 px-3 py-1 text-[11px] sm:text-xs font-bold text-medical-300 border border-medical-500/30">
+                  <Stethoscope className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">Clinical Decision Support System (Nigerian & Global)</span>
                 </span>
-                <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                <h1 className="mt-3 sm:mt-4 text-2xl font-extrabold tracking-tight sm:text-4xl">
                   Diabetic Readmission Risk Predictor
                 </h1>
                 <p className="mt-2 text-sm text-slate-300 leading-relaxed">

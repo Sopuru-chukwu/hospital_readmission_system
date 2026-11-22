@@ -201,16 +201,16 @@ export const PatientHistoryTable: React.FC<PatientHistoryTableProps> = ({ onSele
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
             {/* Search Input */}
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search patient or diagnosis..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-48 sm:w-64 rounded-xl border border-slate-200 bg-white/80 pl-9 pr-3 py-1.5 text-xs font-medium text-slate-900 focus:border-medical-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                className="w-full sm:w-64 rounded-xl border border-slate-200 bg-white/80 pl-9 pr-3 py-1.5 text-xs font-medium text-slate-900 focus:border-medical-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white"
               />
             </div>
 

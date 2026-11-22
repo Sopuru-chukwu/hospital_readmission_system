@@ -269,18 +269,19 @@ export const CohortAnalytics: React.FC = () => {
                 <Pie
                   data={readmissionDistData}
                   cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
+                  cy="45%"
+                  innerRadius={45}
+                  outerRadius={72}
                   paddingAngle={5}
                   dataKey="count"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                  label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
                 >
                   {readmissionDistData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
                 <Tooltip formatter={(value: number | string) => [Number(value).toLocaleString(), 'Patient Encounters']} />
+                <Legend verticalAlign="bottom" height={28} wrapperStyle={{ fontSize: '11px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

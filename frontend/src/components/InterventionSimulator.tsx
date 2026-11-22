@@ -96,20 +96,20 @@ export const InterventionSimulator: React.FC<InterventionSimulatorProps> = ({
   const simulatedTier = getSimulatedRiskTier(projectedRiskScore);
 
   return (
-    <div className="glass rounded-3xl border border-slate-200 p-6 shadow-xl dark:border-slate-800">
+    <div className="glass rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xl dark:border-slate-800">
       
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-200/80 pb-4 dark:border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-4 dark:border-slate-800/80">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Sliders className="h-5 w-5 text-medical-500" />
-            "What-If" Care Plan Intervention Simulator
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Sliders className="h-5 w-5 text-medical-500 shrink-0" />
+            <span>"What-If" Care Plan Intervention Simulator</span>
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Simulate the impact of post-discharge clinical interventions on readmission risk
           </p>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-medical-500/10 px-3 py-1 text-xs font-semibold text-medical-600 dark:text-medical-400 border border-medical-500/20">
+        <span className="self-start sm:self-auto shrink-0 inline-flex items-center gap-1.5 rounded-full bg-medical-500/10 px-3 py-1 text-xs font-semibold text-medical-600 dark:text-medical-400 border border-medical-500/20">
           <Sparkles className="h-3.5 w-3.5" />
           Interactive CDSS
         </span>
@@ -199,12 +199,12 @@ export const InterventionSimulator: React.FC<InterventionSimulatorProps> = ({
                   {isSelected && <CheckCircle2 className="h-4 w-4" />}
                 </div>
 
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                     <span className="text-xs font-bold text-slate-900 dark:text-white">
                       {inv.title}
                     </span>
-                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                    <span className="self-start sm:self-auto shrink-0 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                       -{inv.reductionPercentage}% relative risk
                     </span>
                   </div>

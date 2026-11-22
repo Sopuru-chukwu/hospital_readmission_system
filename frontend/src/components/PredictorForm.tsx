@@ -153,23 +153,23 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
     : [];
 
   return (
-    <div className="glass rounded-3xl border border-slate-200/80 p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900/60">
+    <div className="glass rounded-3xl border border-slate-200/80 p-4 sm:p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900/60">
       
       {/* Header & Quick Sample Profiles */}
-      <div className="flex flex-col gap-4 pb-6 border-b border-slate-200 dark:border-slate-800 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 pb-5 sm:pb-6 border-b border-slate-200 dark:border-slate-800 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="flex items-center space-x-2 text-medical-600 dark:text-medical-400 text-sm font-semibold">
+          <div className="flex items-center space-x-2 text-medical-600 dark:text-medical-400 text-xs sm:text-sm font-semibold">
             <Stethoscope className="h-4 w-4" />
             <span>Clinical Input Parameters</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
             Patient Risk Profile Evaluator
           </h2>
         </div>
 
         {/* Quick Sample Selector */}
         {sampleCases.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" /> Presets:
             </span>
@@ -178,7 +178,7 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
                 key={sample.id}
                 type="button"
                 onClick={() => handleSelectSampleCase(sample)}
-                className="inline-flex items-center space-x-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-medical-50 hover:border-medical-300 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700/60"
+                className="inline-flex items-center space-x-1.5 rounded-full border border-slate-200 bg-white/80 px-2.5 sm:px-3 py-1 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-medical-50 hover:border-medical-300 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700/60"
               >
                 <span>{sample.badge}</span>
               </button>
@@ -188,47 +188,53 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
       </div>
 
       {/* Form Section Navigation */}
-      <div className="mt-6 flex space-x-2 border-b border-slate-200 pb-3 dark:border-slate-800">
+      <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-1 sm:gap-2 border-b border-slate-200 pb-3 dark:border-slate-800">
         <button
           type="button"
           onClick={() => handleTabChange('demographics')}
-          className={`flex items-center space-x-2 border-b-2 px-4 py-2 text-sm font-semibold transition ${
+          className={`flex items-center justify-between sm:justify-start space-x-2 rounded-xl sm:rounded-none border sm:border-0 sm:border-b-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition ${
             activeTab === 'demographics'
-              ? 'border-medical-500 text-medical-600 dark:text-medical-400'
+              ? 'border-medical-500 bg-medical-500/10 sm:bg-transparent text-medical-600 dark:text-medical-400'
               : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <User className="h-4 w-4" />
-          <span>1. Demographics & History</span>
-          {hasPatientName && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
+          <div className="flex items-center space-x-2">
+            <User className="h-4 w-4 shrink-0" />
+            <span>1. Demographics & History</span>
+          </div>
+          {hasPatientName && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
         </button>
 
         <button
           type="button"
           onClick={() => handleTabChange('metrics')}
-          className={`flex items-center space-x-2 border-b-2 px-4 py-2 text-sm font-semibold transition ${
+          className={`flex items-center justify-between sm:justify-start space-x-2 rounded-xl sm:rounded-none border sm:border-0 sm:border-b-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition ${
             activeTab === 'metrics'
-              ? 'border-medical-500 text-medical-600 dark:text-medical-400'
+              ? 'border-medical-500 bg-medical-500/10 sm:bg-transparent text-medical-600 dark:text-medical-400'
               : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <Clock className="h-4 w-4" />
-          <span>2. Admission & Utilization</span>
-          {visitedSteps.has('metrics') && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
+          <div className="flex items-center space-x-2">
+            <Clock className="h-4 w-4 shrink-0" />
+            <span>2. Admission & Utilization</span>
+          </div>
+          {visitedSteps.has('metrics') && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
         </button>
 
         <button
           type="button"
           onClick={() => handleTabChange('labs')}
-          className={`flex items-center space-x-2 border-b-2 px-4 py-2 text-sm font-semibold transition ${
+          className={`flex items-center justify-between sm:justify-start space-x-2 rounded-xl sm:rounded-none border sm:border-0 sm:border-b-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition ${
             activeTab === 'labs'
-              ? 'border-medical-500 text-medical-600 dark:text-medical-400'
+              ? 'border-medical-500 bg-medical-500/10 sm:bg-transparent text-medical-600 dark:text-medical-400'
               : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <Activity className="h-4 w-4" />
-          <span>3. Clinical Labs & Diagnosis</span>
-          {visitedSteps.has('labs') && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
+          <div className="flex items-center space-x-2">
+            <Activity className="h-4 w-4 shrink-0" />
+            <span>3. Clinical Labs & Diagnosis</span>
+          </div>
+          {visitedSteps.has('labs') && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
         </button>
       </div>
 
@@ -650,13 +656,13 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
             </div>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               {activeTab !== 'demographics' && (
                 <button
                   type="button"
                   onClick={() => handleTabChange(activeTab === 'labs' ? 'metrics' : 'demographics')}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                  className="flex-1 sm:flex-initial rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                 >
                   Previous Step
                 </button>
@@ -665,7 +671,7 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
                 <button
                   type="button"
                   onClick={() => handleTabChange(activeTab === 'demographics' ? 'metrics' : 'labs')}
-                  className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-white"
+                  className="flex-1 sm:flex-initial rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-white"
                 >
                   Next Step
                 </button>
@@ -676,7 +682,7 @@ export const PredictorForm: React.FC<PredictorFormProps> = ({
               type="submit"
               disabled={isLoading || !canSubmit}
               title={!canSubmit ? 'Please enter a patient name and complete all 3 steps first' : 'Calculate Readmission Risk'}
-              className="inline-flex items-center space-x-2 rounded-xl bg-medical-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-medical-500/30 transition hover:bg-medical-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-medical-600 disabled:active:scale-100"
+              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 rounded-xl bg-medical-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-medical-500/30 transition hover:bg-medical-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-medical-600 disabled:active:scale-100"
             >
               {isLoading ? (
                 <>
