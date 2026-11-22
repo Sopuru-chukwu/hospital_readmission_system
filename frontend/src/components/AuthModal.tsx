@@ -5,7 +5,6 @@ import {
   Mail, 
   User as UserIcon, 
   ShieldCheck, 
-  Sparkles, 
   ArrowRight,
   RefreshCw,
   AlertCircle
@@ -24,7 +23,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState<'Physician' | 'Nurse' | 'Administrator'>('Physician');
+  const [role, setRole] = useState<'Physician' | 'Nurse'>('Physician');
   const [hospitalName, setHospitalName] = useState('Lagos State University Teaching Hospital (LUTH)');
   
   const [isLoading, setIsLoading] = useState(false);
@@ -60,20 +59,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
     }
   };
 
-  const handleQuickDemoLogin = async (demoEmail: string) => {
-    setErrorMsg(null);
-    setIsLoading(true);
-    try {
-      const res = await api.login({ email: demoEmail, password: 'password123' });
-      onSuccess(res.user);
-      onClose();
-    } catch (err: any) {
-      setErrorMsg('Authentication error. Please check your credentials and try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-fadeIn">
       <div className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl dark:border-slate-800 dark:bg-slate-900 text-slate-900 dark:text-white">
@@ -97,47 +82,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             {isRegisterMode
               ? 'Register a new clinician account for role-based readmission risk assessment.'
-              : 'Sign in to access patient records, audit logs, and risk analytics.'}
+              : 'Sign in with your authorized clinical email and password.'}
           </p>
         </div>
-
-        {/* Preset Role Credentials Selector */}
-        {!isRegisterMode && (
-          <div className="mt-6 rounded-2xl bg-slate-100/80 p-3.5 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800">
-            <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Select Role Profile Credentials:</span>
-            </div>
-            <div className="mt-2.5 grid gap-2 sm:grid-cols-3">
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('dr.babatunde@hospital.ng')}
-                className="flex flex-col items-start rounded-xl border border-slate-200 bg-white p-2.5 text-left text-xs shadow-sm hover:border-medical-400 hover:bg-medical-50/50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 transition"
-              >
-                <span className="font-bold text-slate-900 dark:text-white">Dr. Babatunde</span>
-                <span className="text-[10px] text-medical-600 dark:text-medical-400 font-semibold">Physician (LUTH)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('nurse.chioma@phc.ng')}
-                className="flex flex-col items-start rounded-xl border border-slate-200 bg-white p-2.5 text-left text-xs shadow-sm hover:border-medical-400 hover:bg-medical-50/50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 transition"
-              >
-                <span className="font-bold text-slate-900 dark:text-white">Nurse Chioma</span>
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Nurse (PHC)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('admin@diapredict.ai')}
-                className="flex flex-col items-start rounded-xl border border-slate-200 bg-white p-2.5 text-left text-xs shadow-sm hover:border-medical-400 hover:bg-medical-50/50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 transition"
-              >
-                <span className="font-bold text-slate-900 dark:text-white">Admin Emeka</span>
-                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Administrator</span>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Error Alert */}
         {errorMsg && (
@@ -212,12 +159,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   </label>
                   <select
                     value={role}
-                    onChange={(e) => setRole(e.target.value as any)}
+                    onChange={(e) => setRole(e.target.value as 'Physician' | 'Nurse')}
                     className="mt-1 block w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs font-semibold text-slate-900 focus:border-medical-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white"
                   >
                     <option value="Physician">Attending Physician</option>
                     <option value="Nurse">Nurse Navigator</option>
-                    <option value="Administrator">Hospital Administrator</option>
                   </select>
                 </div>
 

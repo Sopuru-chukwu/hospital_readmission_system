@@ -54,8 +54,14 @@ def login(login_in: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/register", response_model=TokenResponse, summary="Register Clinical Staff")
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
     """
-    Registers a new clinical staff user account.
+    Registers a new clinical staff user account (Physician or Nurse).
+    Administrator accounts cannot be self-registered via the public endpoint.
     """
+    if user_in.role not in ("Physician", "Nurse"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Self-registration is restricted to clinical staff (Physician or Nurse). Administrator accounts must be provisioned by system administration."
+        )
     existing = UserRepository.get_by_email(db, email=user_in.email)
     if existing:
         raise HTTPException(
